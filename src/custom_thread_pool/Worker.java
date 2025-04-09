@@ -1,3 +1,4 @@
+// Worker.java
 package custom_thread_pool;
 
 import java.util.concurrent.*;
@@ -27,14 +28,18 @@ public class Worker implements Runnable {
     public void run() {
         Thread currentThread = Thread.currentThread();
         try {
-            while (running && !pool.isShutdown()) {
+            while (running) {
+                if (pool.isShutdown()) break;
+
                 Runnable task = taskQueue.poll(keepAliveTime, timeUnit);
                 if (task != null) {
                     System.out.println("[Worker] " + currentThread.getName() + " executes " + task);
                     task.run();
                 } else {
-                    System.out.println("[Worker] " + currentThread.getName() + " idle timeout, stopping.");
-                    break;
+                    if (pool.getActiveThreadCount() > pool.getCorePoolSize()) {
+                        System.out.println("[Worker] " + currentThread.getName() + " idle timeout, stopping.");
+                        break;
+                    }
                 }
             }
         } catch (InterruptedException ignored) {
@@ -44,4 +49,3 @@ public class Worker implements Runnable {
         }
     }
 }
-
