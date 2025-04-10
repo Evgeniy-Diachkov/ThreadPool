@@ -1,4 +1,3 @@
-// CustomExecutor.java
 package custom_thread_pool;
 
 import java.util.concurrent.*;
